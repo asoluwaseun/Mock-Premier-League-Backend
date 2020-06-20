@@ -1,5 +1,5 @@
 class ResponseHelper{
-    static async sendResponse(
+    static sendResponse(
         res,
         status,
         error = false,
