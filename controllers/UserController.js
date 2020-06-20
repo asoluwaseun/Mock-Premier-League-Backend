@@ -18,6 +18,18 @@ class UserController{
     static async changePassword(req, res){
 
     }
+
+    static async addUserTeam(req, res){
+
+    }
+
+    static async deleteUserTeam(req, res){
+
+    }
+
+    static async getUserTeamFixtures(req, res){
+
+    }
 }
 
 module.exports = UserController;
