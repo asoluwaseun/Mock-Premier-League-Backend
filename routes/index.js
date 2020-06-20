@@ -1,5 +1,5 @@
-"use strict"
-const express = require("express");
-const router = express.Router();
+const UserRoutes = require('./UserRoutes');
+const FixtureRoutes = require('./FixturesRoutes');
+const TeamsRoutes = require('./TeamsRoutes');
 
-module.exports = router
+module.exports = {UserRoutes, FixtureRoutes, TeamsRoutes};

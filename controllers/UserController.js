@@ -7,7 +7,7 @@ const jwt = require('jsonwebtoken');
 
 class UserController{
     static async registerUser(req, res){
-
+        res.send('hi')
     }
 
     static async registerAdmin(req, res){
