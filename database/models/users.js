@@ -1,4 +1,6 @@
 'use strict';
+const hash = require('bcryptjs');
+
 module.exports = (sequelize, DataTypes) => {
   const users = sequelize.define('users', {
     firstname: DataTypes.STRING,
@@ -6,7 +8,14 @@ module.exports = (sequelize, DataTypes) => {
     email: DataTypes.STRING,
     picture: DataTypes.TEXT,
     phone: DataTypes.STRING,
-    password: DataTypes.TEXT,
+    password: {
+      type: DataTypes.STRING,
+      allowNull: true,
+      set(val) {
+        const _password = hash.hashSync(val, 8);
+        this.setDataValue('password', _password);
+      }
+    },
     role: DataTypes.INTEGER,
     status: DataTypes.INTEGER
   }, {});
@@ -20,6 +29,12 @@ module.exports = (sequelize, DataTypes) => {
     users.hasMany(models.users_logs, {
       foreignKey: 'user_id'
     })
+  };
+
+  users.prototype.toJSON = function () {
+    const values = Object.assign({}, this.get());
+    delete values.password;
+    return values;
   };
   return users;
 };

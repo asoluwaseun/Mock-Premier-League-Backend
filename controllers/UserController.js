@@ -1,3 +1,10 @@
+const Models = require('../database/models/');
+const { encrypt, decrypt} = require('../helpers/Encryption');
+const { sendResponse } = require('../helpers/ResponseHelper');
+const Sequelize = require('sequelize');
+const bcrypt = require('bcryptjs');
+const jwt = require('jsonwebtoken');
+
 class UserController{
     static async registerUser(req, res){
 
