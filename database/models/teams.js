@@ -10,7 +10,17 @@ module.exports = (sequelize, DataTypes) => {
     user_id: DataTypes.INTEGER
   }, {});
   teams.associate = function(models) {
-    // associations can be defined here
+    teams.hasMany(models.fixtures, {
+      as: 'home_team',
+      foreignKey: 'home_team_id'
+    })
+    teams.hasMany(models.fixtures, {
+      as: 'away_team',
+      foreignKey: 'away_team_id'
+    })
+    teams.belongsTo(models.users, {
+      foreignKey: 'user_id'
+    })
   };
   return teams;
 };

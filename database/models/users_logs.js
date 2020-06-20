@@ -5,7 +5,9 @@ module.exports = (sequelize, DataTypes) => {
     action: DataTypes.TEXT
   }, {});
   users_logs.associate = function(models) {
-    // associations can be defined here
+    users_logs.belongsTo(models.users, {
+      foreignKey: 'user_id'
+    })
   };
   return users_logs;
 };

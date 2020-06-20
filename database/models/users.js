@@ -11,7 +11,15 @@ module.exports = (sequelize, DataTypes) => {
     status: DataTypes.INTEGER
   }, {});
   users.associate = function(models) {
-    // associations can be defined here
+    users.hasMany(models.fixtures, {
+      foreignKey: 'user_id'
+    })
+    users.hasMany(models.teams, {
+      foreignKey: 'user_id'
+    })
+    users.hasMany(models.users_logs, {
+      foreignKey: 'user_id'
+    })
   };
   return users;
 };

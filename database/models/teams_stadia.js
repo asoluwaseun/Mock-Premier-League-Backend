@@ -8,7 +8,12 @@ module.exports = (sequelize, DataTypes) => {
     main: DataTypes.INTEGER
   }, {});
   teams_stadia.associate = function(models) {
-    // associations can be defined here
+    teams_stadia.hasMany(models.fixtures, {
+      foreignKey: 'stadium_id'
+    })
+    teams_stadia.belongsTo(models.teams, {
+      foreignKey: 'team_id'
+    })
   };
   return teams_stadia;
 };
