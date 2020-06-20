@@ -27,7 +27,8 @@ console.log('app is running on port', port);
 app.get('/', (req, res)=>{
     res.send('Welcome to The League')
 })
-// app.use('/api/v1',routes);
+
+app.use('/api/v1',routes);
 
 // Handle 404
 app.use(function(req, res) {
