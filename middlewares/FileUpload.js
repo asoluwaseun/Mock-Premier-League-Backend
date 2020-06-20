@@ -5,7 +5,7 @@ const { sendResponse } = require('../helpers/ResponseHelper');
 module.exports = () => async (req, res, next) => {
     try {
         if (req.method === 'POST' || req.method === 'PUT') {
-            const user = req.body.user;
+            const user = req.body ? req.body.user : null;
             const upload = multer({
                 storage: multerGoogleStorage.storageEngine(),
                 fileFilter(req, file, cb) {
@@ -17,22 +17,27 @@ module.exports = () => async (req, res, next) => {
             }).single('image');
 
             upload(req, res, (err) => {
+
                 if (err) {
                     next(err);
                 }
-                req.body.user = user;
+                if(user){
+                    req.body.user = user;
+                }
                 if (req.file) {
-                    req.body.path = req.file.filename;
+                    req.body.image_path = req.file.filename;
                     next()
                 } else {
                     next();
                 }
+
             });
 
         } else {
             sendResponse(res, 203);
         }
     } catch (e) {
+        console.log(e)
         sendResponse(res, 500);
     }
 };

@@ -14,7 +14,19 @@ module.exports  = {
 
             res.status(203).json({ errors: errors.array(), data: false });
         };
-    }
+    },
+
+    register_user: [
+        body('firstname').isString(),
+        body('lastname').isString(),
+        body('email').isEmail().normalizeEmail(),
+        body('phone').isMobilePhone('en-NG'),
+        body('password').isString()
+    ],
+    login_user: [
+        body('email').isEmail().normalizeEmail(),
+        body('password').isString()
+    ]
 }
 
 

@@ -6,10 +6,13 @@ const express = require('express');
 const app = express();
 const compression = require('compression');
 const helmet = require('helmet');
+const bodyParser = require('body-parser');
 const {UserRoutes, FixtureRoutes, TeamsRoutes} = require('./routes/');
 const { sendResponse } = require('./helpers/ResponseHelper');
 
 // MiddleWares
+app.use(bodyParser.json());
+app.use(bodyParser.urlencoded({extended: false}));
 app.use(helmet());
 app.use(compression());
 
@@ -34,12 +37,13 @@ app.use('/api/v1', UserRoutes, FixtureRoutes, TeamsRoutes);
 
 // Handle 404
 app.use(function (req, res) {
-    sendResponse(res, 500);
+    sendResponse(res, 404);
 })
 
 
 //Handle Server Error
 app.use(function (error, req, res, next) {
+    console.log(error)
     sendResponse(res, 500);
 })
 
