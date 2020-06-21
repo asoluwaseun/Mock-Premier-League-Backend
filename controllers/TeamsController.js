@@ -365,6 +365,7 @@ class TeamsController{
         }
     }
 
+
     static async deleteTeamStadium(req, res){
         try{
             let { stadium_id } = req.params;
@@ -386,6 +387,11 @@ class TeamsController{
                         where: {
                             id: stadium_id
                         }
+                    }),
+                    Models.fixtures.destroy({
+                       where: {
+                           stadium_id: stadium_id
+                       }
                     }),
                     Models.users_logs.create({
                         user_id,
