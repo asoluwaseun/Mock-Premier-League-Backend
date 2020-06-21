@@ -1,7 +1,9 @@
 const Models = require('../database/models/');
 const { encrypt} = require('../helpers/Encryption');
 const { sendResponse } = require('../helpers/ResponseHelper');
-const Sequelize = require('sequelize');
+const Pagination = require('../helpers/PaginationHelper');
+
+const Op = require('sequelize').Op;
 const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
 
@@ -162,11 +164,153 @@ class TeamsController{
         }
     }
 
+    static async viewTeam(req, res){
+        try{
+            let { team_id } = req.params;
+
+            let team_details = await Models.teams.findOne({
+                where:{
+                    id: team_id
+                },
+                include: [
+                    {
+                        as: "home_fixtures",
+                        model: Models.fixtures,
+                        include: [
+                            {
+                                as: "away_team",
+                                model: Models.teams
+                            }
+                        ]
+                    },
+                    {
+                        as: "away_fixtures",
+                        model: Models.fixtures,
+                        include: [
+                            {
+                                as: "home_team",
+                                model: Models.teams
+                            }
+                        ]
+                    },
+                    Models.teams_stadia
+                ]
+            });
+
+            if(team_details){
+                sendResponse(res, 200, false, team_details);
+            }
+            else{
+                sendResponse(res, 404);
+            }
+        }
+        catch (err) {
+            console.log(err)
+            sendResponse(res, 500);
+        }
+    }
+
     static async viewTeams(req, res){
         try{
 
+            let {page: page_id, order, search} = req.query;
+            let options = {};
+            let _order = [];
+
+            if(search){
+                options[Op.or] = [
+                    {
+                        fullname: {
+                            [Op.like] : `%${search}%`
+                        }
+                    },
+                    {
+                        shortname: {
+                            [Op.like] : `%${search}%`
+                        }
+                    },
+                    {
+                        nickname: {
+                            [Op.like] : `%${search}%`
+                        }
+                    },
+                    {
+                        manager: {
+                            [Op.like] : `%${search}%`
+                        }
+                    },
+                    {
+                        founder: {
+                            [Op.like] : `%${search}%`
+                        }
+                    }
+                ]
+            }
+
+            if(order){
+                if(order === "name-asc"){
+                    _order = [
+                        ['fullname', 'ASC']
+                    ]
+                }
+                if(order === "name-desc"){
+                    _order = [
+                        ['fullname', 'DESC']
+                    ]
+                }
+            }
+
+            let {count: all_teams} = await Models.teams.findAndCountAll();
+
+            let currentPage = page_id > 0 ? page_id : 1;
+            let perPage = 12;
+
+
+            let Paginate = new Pagination(all_teams,currentPage,perPage);
+
+            let teams = await Models.teams.findAll({
+                where: options,
+                include: [
+                    {
+                        as: "home_fixtures",
+                        model: Models.fixtures,
+                        include: [
+                            {
+                                as: "away_team",
+                                model: Models.teams
+                            }
+                        ]
+                    },
+                    {
+                        as: "away_fixtures",
+                        model: Models.fixtures,
+                        include: [
+                            {
+                                as: "home_team",
+                                model: Models.teams
+                            }
+                        ]
+                    },
+                    Models.teams_stadia
+                ],
+                order: _order,
+                limit: Paginate.perPage,
+                offset: Paginate.offset
+            })
+
+            let data = {
+                total_teams: all_teams,
+                per_page: Paginate.perPage,
+                current_page: Paginate.pageCount > Paginate.offset ? Paginate.pageCount : 1,
+                total_pages: Paginate.pageCount,
+                teams: teams
+            }
+
+            sendResponse(res, 200, false, data)
+
         }
         catch (err) {
+            console.log(err)
             sendResponse(res, 500);
         }
     }
