@@ -11,7 +11,13 @@ const {
 const Authentication = require('../middlewares/Authentication');
 const Authorization = require('../middlewares/Authorization');
 
+router.get('/fixtures',FixturesController.viewFixtures);
+router.get('/fixture/team/:team_id',FixturesController.viewTeamFixtures);
+
 router.route('/fixture/:fixture_id?')
+    .get(
+        FixturesController.viewFixture
+    )
     .post(
         Authentication,
         Authorization([process.env.ADMIN_ROLE]),

@@ -50,6 +50,11 @@ module.exports  = {
         body('home_team_goal').optional().isBoolean(),
         body('away_team_goal').optional().isBoolean(),
         body('status').optional().isString()
+    ],
+    add_stadium: [
+        body('name').isString(),
+        body('nickname').optional().isString(),
+        body('team_id').isInt()
     ]
 }
 

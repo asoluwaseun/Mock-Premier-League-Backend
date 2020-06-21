@@ -65,7 +65,6 @@ class FixturesController{
             }
         }
         catch(err){
-            console.log(err)
             sendResponse(res, 500);
         }
     }
@@ -131,7 +130,6 @@ class FixturesController{
             }
         }
         catch(err){
-            console.log(err);
             sendResponse(res, 500);
         }
     }
@@ -176,18 +174,155 @@ class FixturesController{
 
         }
         catch (err) {
-            console.log(err)
-            sendResponse(res, 500)
+            sendResponse(res, 500);
         }
     }
 
     static async viewFixture(req, res){
+        try{
+            let { fixture_id } = req.params;
 
+            let fixture_details = await Models.fixtures.findOne({
+                where: {
+                    id: fixture_id ? fixture_id : 0
+                },
+                include: [
+                    {
+                        as: "home_team",
+                        model: Models.teams
+                    },
+                    {
+                        as: "away_team",
+                        model: Models.teams
+                    },
+                    Models.teams_stadia
+                ]
+            });
+
+            if(fixture_details){
+                sendResponse(res, 200, false, fixture_details);
+            }
+            else{
+                sendResponse(res, 404);
+            }
+        }
+        catch(err){
+            sendResponse(res, 500);
+        }
     }
 
     static async viewFixtures(req, res){
         try{
 
+            let {page: page_id, order, filter} = req.query;
+            let options = {};
+            let _order = [];
+
+            if(filter){
+                if(filter == 1){
+                    options.status = 1;
+                }
+                else if(filter == 2){
+                    options.status = 2;
+                }
+                else if(filter == -1){
+                    options.status = -1;
+                }
+                else{
+                    options.status = 0
+                }
+            }
+            if(order){
+                if(order === "date-asc"){
+                    _order = [
+                        ['match_date', 'ASC']
+                    ]
+                }
+                if(order === "name-desc"){
+                    _order = [
+                        ['match_date', 'DESC']
+                    ]
+                }
+            }
+
+            let {count: all_fixtures} = await Models.fixtures.findAndCountAll({
+                where: options
+            });
+
+            let currentPage = page_id > 0 ? page_id : 1;
+            let perPage = 12;
+
+
+            let Paginate = new Pagination(all_fixtures,currentPage,perPage);
+
+            let fixtures = await Models.fixtures.findAll({
+                where: options,
+                include: [
+                    {
+                        as: "home_team",
+                        model: Models.teams
+                    },
+                    {
+                        as: "away_team",
+                        model: Models.teams
+                    },
+                    Models.teams_stadia
+                ],
+                order: _order,
+                limit: Paginate.perPage,
+                offset: Paginate.offset
+            })
+
+            let data = {
+                total_teams: all_fixtures,
+                per_page: Paginate.perPage,
+                current_page: Paginate.pageCount > Paginate.offset ? Paginate.pageCount : 1,
+                total_pages: Paginate.pageCount,
+                fixtures: fixtures
+            }
+
+            sendResponse(res, 200, false, data)
+
+        }
+        catch (err) {
+            sendResponse(res, 500);
+        }
+    }
+
+    static async viewTeamFixtures(req, res){
+        try{
+            let { team_id } = req.params;
+
+            let fixture_details = await Models.fixtures.findAll({
+                where: {
+                    [Op.or] : [
+                        {
+                            home_team_id: team_id
+                        },
+                        {
+                            away_team_id: team_id
+                        }
+                    ]
+                },
+                include: [
+                    {
+                        as: "home_team",
+                        model: Models.teams
+                    },
+                    {
+                        as: "away_team",
+                        model: Models.teams
+                    },
+                    Models.teams_stadia
+                ]
+            });
+
+            if(fixture_details){
+                sendResponse(res, 200, false, fixture_details);
+            }
+            else{
+                sendResponse(res, 404);
+            }
         }
         catch(err){
             sendResponse(res, 500);

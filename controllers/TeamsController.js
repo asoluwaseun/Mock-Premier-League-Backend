@@ -134,22 +134,29 @@ class TeamsController{
             });
 
             if(team_details){
-                let delete_team = await Models.teams.destroy({
-                    where: {
-                        id: team_id
-                    }
-                });
-
-                if(delete_team){
-                    await Models.users_logs.create({
+                await Promise.all([
+                    Models.teams.destroy({
+                        where: {
+                            id: team_id
+                        }
+                    }),
+                    Models.fixtures.destroy({
+                        where: {
+                            home_team_id: team_id
+                        }
+                    }),
+                    Models.fixtures.destroy({
+                        where: {
+                            away_team_id: team_id
+                        }
+                    }),
+                    Models.users_logs.create({
                         user_id,
                         action: `User ${user_id} deleted team ${team_details.fullname} with id ${team_details.id}`
-                    });
-                    sendResponse(res, 204);
-                }
-                else{
-                    sendResponse(res, 203);
-                }
+                    })
+                ])
+
+                sendResponse(res, 204);
             }
             else{
                 sendResponse(res, 203, true, false, "Team not found")
@@ -257,7 +264,9 @@ class TeamsController{
                 }
             }
 
-            let {count: all_teams} = await Models.teams.findAndCountAll();
+            let {count: all_teams} = await Models.teams.findAndCountAll({
+                where: options
+            });
 
             let currentPage = page_id > 0 ? page_id : 1;
             let perPage = 12;
@@ -312,34 +321,98 @@ class TeamsController{
         }
     }
 
-    static async addTeamStadia(req, res){
-
-    }
-    static async viewTeamsStadia(req, res){
-
-    }
-
-    static async viewTeamsFixtures(req, res){
+    static async createTeamStadium(req, res){
         try{
+            let {
+                name,
+                nickname,
+                team_id,
+                image_path,
+                user: {
+                    user_id
+                }
+            } = req.body;
+
+            let [stadium_details, created] = await Models.teams_stadia.findOrCreate({
+                where: {
+                    name: name,
+                    team_id: team_id
+                },
+                defaults: {
+                    name,
+                    nickname,
+                    image: image_path ? `${process.env.GCS_BUCKET_URL}/${image_path}` : null,
+                    team_id,
+                    main: 1
+                }
+            });
+
+            if(created){
+                await Models.users_logs.create({
+                    user_id,
+                    action: `User ${user_id} created stadium ${stadium_details.name} for team ${stadium_details.team_id} with id ${stadium_details.id}`
+                })
+                sendResponse(res, 201, false, stadium_details);
+            }
+            else{
+                sendResponse(res, 203, true, false, "Stadium Already Exists for Team");
+            }
 
         }
-        catch (err) {
-
+        catch(err){
+            console.log(err)
+            sendResponse(res, 500);
         }
     }
 
+    static async deleteTeamStadium(req, res){
+        try{
+            let { stadium_id } = req.params;
+            let {
+                user: {
+                    user_id
+                }
+            } = req.body;
 
+            let stadium_details = await Models.teams_stadia.findOne({
+                where: {
+                    id: stadium_id ? stadium_id : 0
+                }
+            });
 
-    static async addUserTeam(req, res){
-
+            if(stadium_details){
+                await Promise.all([
+                    Models.teams_stadia.destroy({
+                        where: {
+                            id: stadium_id
+                        }
+                    }),
+                    Models.users_logs.create({
+                        user_id,
+                        action: `User ${user_id} deleted stadium ${stadium_details.name} with id ${stadium_details.id}`
+                    })
+                ])
+                sendResponse(res, 204);
+            }
+            else{
+                sendResponse(res, 404);
+            }
+        }
+        catch(err){
+            sendResponse(res, 500);
+        }
     }
 
-    static async deleteUserTeam(req, res){
-
-    }
-
-    static async getUserTeamFixtures(req, res){
-
+    static async viewTeamsStadia(req, res){
+        try{
+            let teams_stadia = await Models.teams_stadia.findAll({
+                include: [Models.teams]
+            });
+            sendResponse(res, 200, false, teams_stadia);
+        }
+        catch(err){
+            sendResponse(res, 500);
+        }
     }
 }
 

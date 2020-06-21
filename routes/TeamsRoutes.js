@@ -4,17 +4,18 @@ const router = express.Router();
 const TeamsController = require('../controllers/TeamsController');
 const {
     validate,
-    add_team
+    add_team,
+    add_stadium
 } = require('../middlewares/Validators');
 
 const FileUpload = require('../middlewares/FileUpload');
 const Authentication = require('../middlewares/Authentication');
 const Authorization = require('../middlewares/Authorization');
 
-router.get('/team/:team_id', TeamsController.viewTeam);
-router.get('/teams', TeamsController.viewTeams);
-
 router.route('/team/:team_id?')
+    .get(
+        TeamsController.viewTeam
+    )
     .post(
         Authentication,
         Authorization([process.env.ADMIN_ROLE]),
@@ -33,6 +34,23 @@ router.route('/team/:team_id?')
         Authentication,
         Authorization([process.env.ADMIN_ROLE]),
         TeamsController.deleteTeam
+    )
+
+router.get('/teams', TeamsController.viewTeams);
+
+router.route('/teams/stadia/:stadium_id?')
+    .get(TeamsController.viewTeamsStadia)
+    .post(
+        Authentication,
+        Authorization([process.env.ADMIN_ROLE]),
+        FileUpload(),
+        validate(add_stadium),
+        TeamsController.createTeamStadium
+    )
+    .delete(
+        Authentication,
+        Authorization([process.env.ADMIN_ROLE]),
+        TeamsController.deleteTeamStadium
     )
 
 module.exports = router
