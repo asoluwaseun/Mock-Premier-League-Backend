@@ -14,7 +14,10 @@ module.exports = (sequelize, DataTypes) => {
     stadium_id: DataTypes.INTEGER,
     match_date: DataTypes.DATE,
     user_id: DataTypes.INTEGER,
-    status: DataTypes.INTEGER
+    status: {
+      type: DataTypes.INTEGER,
+      defaultValue: 1
+    }
   }, {});
   fixtures.associate = function(models) {
     fixtures.belongsTo(models.teams, {

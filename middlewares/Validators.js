@@ -44,6 +44,12 @@ module.exports  = {
         body('away_team_id').isInt(),
         body('stadium_id').isInt(),
         body('match_date').isString()
+    ],
+    edit_fixture: [
+        body('match_date').optional().isString(),
+        body('home_team_goal').optional().isBoolean(),
+        body('away_team_goal').optional().isBoolean(),
+        body('status').optional().isString()
     ]
 }
 

@@ -4,7 +4,8 @@ const router = express.Router();
 const FixturesController = require('../controllers/FixturesController');
 const {
     validate,
-    add_fixture
+    add_fixture,
+    edit_fixture
 } = require('../middlewares/Validators');
 
 const Authentication = require('../middlewares/Authentication');
@@ -16,6 +17,12 @@ router.route('/fixture/:fixture_id?')
         Authorization([process.env.ADMIN_ROLE]),
         validate(add_fixture),
         FixturesController.createFixture
+    )
+    .put(
+        Authentication,
+        Authorization([process.env.ADMIN_ROLE]),
+        validate(edit_fixture),
+        FixturesController.updateFixture
     )
     .delete(
         Authentication,

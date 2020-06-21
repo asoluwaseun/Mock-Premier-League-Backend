@@ -90,7 +90,7 @@ class TeamsController{
                     update_payload.logo = `${process.env.GCS_BUCKET_URL}/${image_path}`;
                 }
 
-                let update_team = await Models.teams.update(update_payload, {
+                let [update_team] = await Models.teams.update(update_payload, {
                     where :{
                         id: team_id ? team_id : 0
                     }
@@ -101,7 +101,7 @@ class TeamsController{
                         user_id,
                         action: `User ${user_id} updated team ${team_details.fullname} with id ${team_details.id}`
                     });
-                    sendResponse(res, 200, false, team_details, "Team Updated");
+                    sendResponse(res, 200, false, true, "Team Updated");
                 }
                 else{
                     sendResponse(res, 203);
@@ -109,7 +109,7 @@ class TeamsController{
 
             }
             else{
-                sendResponse(res, 203, true, false, "Team not found")
+                sendResponse(res, 203, true, false, "Team not found");
             }
         }
         catch(err){

@@ -70,9 +70,65 @@ class FixturesController{
         }
     }
 
-    static async editFixture(req, res){
+    static async updateFixture(req, res){
         try{
+            let {
+                match_date,
+                home_team_goal,
+                away_team_goal,
+                status,
+                user: {
+                    user_id
+                }
+            } = req.body;
+            let { fixture_id } = req.params;
 
+            let fixture_details = await Models.fixtures.findOne({
+                where: {
+                    id: fixture_id ? fixture_id : 0
+                }
+            })
+
+            if(fixture_details){
+                let update_payload = {};
+
+                if(status){
+                    update_payload.status = status === 'cancelled' ? -1 : status === 'completed' ? 2 : 0;
+                }
+                if(home_team_goal){
+                    update_payload.home_team_goals = parseInt(fixture_details.home_team_goals) + 1;
+                }
+                if(away_team_goal){
+                    update_payload.away_team_goals = parseInt(fixture_details.away_team_goals) + 1;
+                }
+                if(match_date){
+                    update_payload.match_date = match_date
+                }
+
+                if(Object.keys(update_payload).length === 0){
+                    return sendResponse(res, 203, true, false, "Nothing to update");
+                }
+
+                let [update_fixture] = await Models.fixtures.update(update_payload,{
+                    where: {
+                        id: fixture_id
+                    }
+                })
+
+                if(update_fixture){
+                    await Models.users_logs.create({
+                        user_id,
+                        action: `User ${user_id} updated fixture with id ${fixture_details.id}`
+                    });
+                    sendResponse(res, 200, false, true, "Fixture Updated");
+                }
+                else{
+                    sendResponse(res, 203);
+                }
+            }
+            else{
+                sendResponse(res, 203, true, false, "Fixture not found")
+            }
         }
         catch(err){
             console.log(err);
@@ -125,8 +181,17 @@ class FixturesController{
         }
     }
 
-    static async viewFixtures(req, res){
+    static async viewFixture(req, res){
 
+    }
+
+    static async viewFixtures(req, res){
+        try{
+
+        }
+        catch(err){
+            sendResponse(res, 500);
+        }
     }
 }
 
