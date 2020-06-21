@@ -1,0 +1,1 @@
+This repo contains a mock premier league backend. The api documentation can be accessed on [![Run in Postman](https://run.pstmn.io/button.svg)](https://app.getpostman.com/run-collection/c62187d4edf22726ac97)
