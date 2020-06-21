@@ -17,6 +17,9 @@ module.exports = {
       founder: {
         type: Sequelize.STRING
       },
+      manager: {
+        type: Sequelize.STRING
+      },
       logo: {
         type: Sequelize.TEXT
       },

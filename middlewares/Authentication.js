@@ -5,7 +5,8 @@ require('dotenv');
 
 module.exports = (req, res, next) => {
     try {
-        let token = req.headers['Authorization'] &&  req.headers['Authorization'].split(" ").length === 2 ? req.headers['Authorization'].split(" ")[1] : null;
+        let token = req.headers['authorization'] &&  req.headers['authorization'].split(" ").length === 2 ? req.headers['authorization'].split(" ")[1] : null;
+
         if (token) {
             jwt.verify(token, process.env.JWT_SECRET, (err, decoded) => {
                 if (!err) {

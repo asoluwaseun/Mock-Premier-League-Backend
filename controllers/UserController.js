@@ -1,7 +1,6 @@
 const Models = require('../database/models/');
-const { encrypt, decrypt} = require('../helpers/Encryption');
+const { encrypt } = require('../helpers/Encryption');
 const { sendResponse } = require('../helpers/ResponseHelper');
-const Sequelize = require('sequelize');
 const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
 
@@ -27,7 +26,7 @@ class UserController{
                     phone,
                     email,
                     password,
-                    role: req.path === '/admin' ? 1 : 0,
+                    role: req.path === '/admin' ? process.env.ADMIN_ROLE : process.env.USER_ROLE,
                     status: 1,
                     picture: image_path ? `${process.env.GCS_BUCKET_URL}/${image_path}` : null
                 }
@@ -40,14 +39,13 @@ class UserController{
                 }, process.env.JWT_SECRET));
                 delete user_details.dataValues.role;
 
-                return sendResponse(res, 200, false,user_details);
+                return sendResponse(res, 201, false,user_details);
             }
             else{
                 return sendResponse(res, 203, true, false, "User Already Exists");
             }
         }
         catch(err){
-            console.log(err);
             sendResponse(res, 500);
         }
     }
@@ -62,7 +60,7 @@ class UserController{
             let user_details = await Models.users.findOne({
                 where: {
                     email: email,
-                    role: req.path === '/admin/login' ? 1 : 0
+                    role: req.path === '/admin/login' ? process.env.ADMIN_ROLE : process.env.USER_ROLE,
                 }
             });
 
@@ -85,25 +83,47 @@ class UserController{
             }
         }
         catch(err){
-            console.log(err)
             sendResponse(res, 500);
         }
     }
 
     static async changePassword(req, res){
+        try{
+            let {
+                old_password,
+                new_password
+            } = req.body;
 
-    }
+            let user = req.body.user;
+            let user_details = await Models.users.findOne({
+                where: {
+                    id: user.user_id
+                }
+            });
 
-    static async addUserTeam(req, res){
-
-    }
-
-    static async deleteUserTeam(req, res){
-
-    }
-
-    static async getUserTeamFixtures(req, res){
-
+            if(user_details){
+                const check_pass = await bcrypt.compare(old_password, user_details.password);
+                if(check_pass){
+                    await Models.users.update({
+                        password: new_password
+                    },{
+                        where: {
+                            id: user.user_id
+                        }
+                    })
+                    return sendResponse(res, 200, false,true, "Password Updated");
+                }
+                else{
+                    return sendResponse(res, 401, true, false, "Invalid Password")
+                }
+            }
+            else{
+                return sendResponse(res, 401, true, false, "Invalid User or Password")
+            }
+        }
+        catch (err) {
+            sendResponse(res, 500);
+        }
     }
 }
 

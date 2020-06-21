@@ -8,7 +8,7 @@ module.exports = (values = [])=>{
             let user_type = req.body.user["user_type"];
 
             let index = values.findIndex((u)=>{
-                return u === user_type;
+                return u == user_type;
             })
 
             if(index > -1){

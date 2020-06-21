@@ -26,6 +26,18 @@ module.exports  = {
     login_user: [
         body('email').isEmail().normalizeEmail(),
         body('password').isString()
+    ],
+    change_password: [
+        body('old_password').isString(),
+        body('new_password').isString()
+    ],
+    add_team: [
+        body('fullname').isString(),
+        body('shortname').isString(),
+        body('founder').isString(),
+        body('manager').isString(),
+        body('nickname').isString(),
+        body('website').optional().isURL()
     ]
 }
 
