@@ -216,7 +216,9 @@ class FixturesController{
 
             let {page: page_id, order, filter} = req.query;
             let options = {};
-            let _order = [];
+            let _order = [
+                ['match_date', 'ASC']
+            ];
 
             if(filter){
                 if(filter == 1){
@@ -238,7 +240,7 @@ class FixturesController{
                         ['match_date', 'ASC']
                     ]
                 }
-                if(order === "name-desc"){
+                if(order === "date-desc"){
                     _order = [
                         ['match_date', 'DESC']
                     ]
@@ -274,7 +276,7 @@ class FixturesController{
             })
 
             let data = {
-                total_teams: all_fixtures,
+                total_fixtures: all_fixtures,
                 per_page: Paginate.perPage,
                 current_page: Paginate.pageCount > Paginate.offset ? Paginate.pageCount : 1,
                 total_pages: Paginate.pageCount,

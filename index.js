@@ -4,11 +4,15 @@ require('dotenv').config();
 
 const express = require('express');
 const app = express();
+const cors = require('cors');
 const compression = require('compression');
 const helmet = require('helmet');
 const bodyParser = require('body-parser');
 const {UserRoutes, FixtureRoutes, TeamsRoutes} = require('./routes/');
 const { sendResponse } = require('./helpers/ResponseHelper');
+
+app.use(cors());
+app.options('*', cors());
 
 // MiddleWares
 app.use(bodyParser.json());
@@ -16,10 +20,7 @@ app.use(bodyParser.urlencoded({extended: false}));
 app.use(helmet());
 app.use(compression());
 
-app.use((req, res, next) => {
-    res.header("Access-Control-Allow-Origin", "*");
-    next();
-});
+
 
 // starting the app
 const port = process.env.PORT;
