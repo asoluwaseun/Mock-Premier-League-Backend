@@ -26,5 +26,10 @@ router.route('/team/:team_id?')
         validate(add_team),
         TeamsController.updateTeam
     )
+    .delete(
+        Authentication,
+        Authorization([process.env.ADMIN_ROLE]),
+        TeamsController.deleteTeam
+    )
 
 module.exports = router

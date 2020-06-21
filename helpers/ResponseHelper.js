@@ -22,6 +22,8 @@ class ResponseHelper{
                 response["error"] = true;
                 response["message"] = message ? message : "An Error Occured";
                 break;
+            case 204:
+                break;
             case 401:
                 response["error"] = true;
                 response["message"] = message ? message : "Unauthorized Access";

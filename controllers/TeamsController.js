@@ -120,6 +120,41 @@ class TeamsController{
 
     static async deleteTeam(req, res){
         try {
+            let {
+                user: {
+                    user_id
+                }
+            } = req.body;
+
+            let { team_id } = req.params;
+
+            let team_details = await Models.teams.findOne({
+                where: {
+                    id: team_id
+                }
+            });
+
+            if(team_details){
+                let delete_team = await Models.teams.destroy({
+                    where: {
+                        id: team_id
+                    }
+                });
+
+                if(delete_team){
+                    await Models.users_logs.create({
+                        user_id,
+                        action: `User ${user_id} deleted team ${team_details.fullname} with id ${team_details.id}`
+                    });
+                    sendResponse(res, 204);
+                }
+                else{
+                    sendResponse(res, 203);
+                }
+            }
+            else{
+                sendResponse(res, 203, true, false, "Team not found")
+            }
 
         }
         catch (err) {
@@ -128,7 +163,12 @@ class TeamsController{
     }
 
     static async viewTeams(req, res){
+        try{
 
+        }
+        catch (err) {
+            sendResponse(res, 500);
+        }
     }
 
     static async viewTeamsFixtures(req, res){
