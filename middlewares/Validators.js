@@ -38,6 +38,12 @@ module.exports  = {
         body('manager').isString(),
         body('nickname').isString(),
         body('website').optional().isURL()
+    ],
+    add_fixture: [
+        body('home_team_id').isInt(),
+        body('away_team_id').isInt(),
+        body('stadium_id').isInt(),
+        body('match_date').isString()
     ]
 }
 

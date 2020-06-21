@@ -1,14 +1,11 @@
 const Models = require('../database/models/');
-const { encrypt} = require('../helpers/Encryption');
 const { sendResponse } = require('../helpers/ResponseHelper');
 const Pagination = require('../helpers/PaginationHelper');
 
 const Op = require('sequelize').Op;
-const bcrypt = require('bcryptjs');
-const jwt = require('jsonwebtoken');
 
 class TeamsController{
-    static async addTeam(req, res){
+    static async createTeam(req, res){
         try{
             let {
                 fullname,
@@ -95,7 +92,7 @@ class TeamsController{
 
                 let update_team = await Models.teams.update(update_payload, {
                     where :{
-                        id: team_id
+                        id: team_id ? team_id : 0
                     }
                 });
 
@@ -132,7 +129,7 @@ class TeamsController{
 
             let team_details = await Models.teams.findOne({
                 where: {
-                    id: team_id
+                    id: team_id ? team_id : 0
                 }
             });
 
@@ -170,7 +167,7 @@ class TeamsController{
 
             let team_details = await Models.teams.findOne({
                 where:{
-                    id: team_id
+                    id: team_id ? team_id : 0
                 },
                 include: [
                     {
@@ -315,13 +312,23 @@ class TeamsController{
         }
     }
 
-    static async viewTeamsFixtures(req, res){
+    static async addTeamStadia(req, res){
 
     }
-
     static async viewTeamsStadia(req, res){
 
     }
+
+    static async viewTeamsFixtures(req, res){
+        try{
+
+        }
+        catch (err) {
+
+        }
+    }
+
+
 
     static async addUserTeam(req, res){
 

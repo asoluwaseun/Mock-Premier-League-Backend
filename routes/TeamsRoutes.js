@@ -20,7 +20,7 @@ router.route('/team/:team_id?')
         Authorization([process.env.ADMIN_ROLE]),
         FileUpload(),
         validate(add_team),
-        TeamsController.addTeam
+        TeamsController.createTeam
     )
     .put(
         Authentication,
