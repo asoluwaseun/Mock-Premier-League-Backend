@@ -18,9 +18,7 @@ module.exports  = {
 
     register_user: [
         body('firstname').isString(),
-        body('lastname').isString(),
         body('email').isEmail().normalizeEmail(),
-        body('phone').isMobilePhone('en-NG'),
         body('password').isString()
     ],
     login_user: [
