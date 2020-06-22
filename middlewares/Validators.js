@@ -12,7 +12,7 @@ module.exports  = {
                 return next();
             }
 
-            res.status(203).json({ errors: errors.array(), data: false });
+            res.status(203).json({ error: errors.array(), data: false });
         };
     },
 
